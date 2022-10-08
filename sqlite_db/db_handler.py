@@ -50,7 +50,16 @@ def first_db_creation():
 
 def put_data(data: DataFrame) -> None:
     with sqlite3.connect("../vtb_hack.db") as conn:
+        cursor = conn.cursor()
         for row in data:
-            conn.execute(f"INSERT INTO news VALUES ({', '.join(row)})")
+            cursor.execute(f"INSERT INTO news VALUES ({', '.join(row)})")
 
-print(first_db_creation())
+
+def set_like(news_id: int, field: str):
+    with sqlite3.connect("../vtb_hack.db") as conn:
+        cursor = conn.cursor()
+        cursor.execute(f"UPDATE news SET {field}={field}+1 WHERE id={news_id}")
+
+
+if __name__ == "__main__":
+    print(first_db_creation())
