@@ -1,4 +1,5 @@
 import sqlite3
+from pandas import DataFrame
 
 from os import getenv
 
@@ -17,13 +18,13 @@ def first_db_creation():
         cursor = conn.cursor()
 
         cursor.execute("""
-            CREATE TABLE users (
+            CREATE TABLE IF NOT EXISTS users (
                        user_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
                        category VARCHAR(30) NOT NULL)
                        """
         )
         request = f"""
-            CREATE TABLE news (
+            CREATE TABLE IF NOT EXISTS news (
                        news_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
                        title TEXT NOT NULL,
                        full_text TEXT NOT NULL,
@@ -45,5 +46,11 @@ def first_db_creation():
 
         conn.commit()
         return {"status": "ok"}
+
+
+def put_data(data: DataFrame) -> None:
+    with sqlite3.connect("../vtb_hack.db") as conn:
+        for row in data:
+            conn.execute(f"INSERT INTO news VALUES ({', '.join(row)})")
 
 print(first_db_creation())
