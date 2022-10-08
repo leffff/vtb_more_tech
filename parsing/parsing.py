@@ -100,14 +100,16 @@ def parse_clerk(page_num=1) -> pd.DataFrame:
 
     dates = [datetime.today().strftime('%Y-%m-%d')] * n_samples
 
-    print(*full_texts, sep="\n")
+    trends = [el.find_all('span', class_='rubric-title')[0].text.strip() for el in page_requests]
 
+    print(*full_texts, sep="\n")
 
     return pd.DataFrame({
         "title": titles,
         "full_text": full_texts,
         "link": links,
-        "date": dates
+        "date": dates,
+        "trend": trends,
     })
 
 # all_parts = []
@@ -115,5 +117,4 @@ def parse_clerk(page_num=1) -> pd.DataFrame:
 #     all_parts.append(parse_clerk(i))
 #
 # pd.concat(all_parts).to_csv("clerk_1.csv", index=False)
-
 parse_clerk(0)
