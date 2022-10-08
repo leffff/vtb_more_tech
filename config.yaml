@@ -1,0 +1,20 @@
+digests:
+  model_name: "IlyaGusev/rubert_telegram_headlines"
+  local_dir: "rubert_telegram_headlines"
+
+embeddings:
+  model_name: "sberbank-ai/ruRoberta-large"
+  local_dir: "ruRoberta-large"
+
+svd:
+  local_dir: "svd_models"
+
+catboost:
+  local_dir: "catboost_models"
+
+categories: ["buh", "business"]
+
+database:
+  name: vtb_hack.db
+
+data_sources: ["clerk", "consultant"]

@@ -1,11 +1,5 @@
-uvicorn==0.18.3
-fastapi
-pydantic==1.10.2
-SQLAlchemy==1.4.41
-alembic==1.8.1
-asyncpg==0.26.0
-SQLAlchemy-Utils==0.38.3
-
+sqlite3
+flask
 torch
 numpy
 pandas
@@ -14,7 +8,7 @@ requests
 beautifulsoup4
 transformers
 scikit-learn
+joblib==1.2.0
 isort
 black
-
-async_generator
+lxml

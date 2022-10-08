@@ -65,6 +65,9 @@ def parse_consultant(page_num=1) -> pd.DataFrame:
              .find_all("div", class_="news-page__date")[0].text
              for el in page_requests]))
 
+
+    trends = [", ".join([tag.text for tag in el.find_all("div", class_="tags-news__expandable")[0].find_all("span", class_="tags-news__item")]) for el in page_requests]
+
     full_texts = []
     for page in pages:
         full_text = ""
@@ -76,7 +79,8 @@ def parse_consultant(page_num=1) -> pd.DataFrame:
         "title": titles,
         "full_text": full_texts,
         "link": links,
-        "date": dates
+        "date": dates,
+        "trend": trends
     })
 
 
@@ -100,9 +104,14 @@ def parse_clerk(page_num=1) -> pd.DataFrame:
 
     dates = [datetime.today().strftime('%Y-%m-%d')] * n_samples
 
-    trends = [el.find_all('span', class_='rubric-title')[0].text.strip() for el in page_requests]
 
-    print(*full_texts, sep="\n")
+    trends = []
+    for el in page_requests:
+        req = el.find_all('span', class_='rubric-title')
+        if len(req) > 0:
+            trends.append(req[0].text.strip())
+        else:
+            trends.append("Нет тренда")
 
     return pd.DataFrame({
         "title": titles,
@@ -111,10 +120,3 @@ def parse_clerk(page_num=1) -> pd.DataFrame:
         "date": dates,
         "trend": trends,
     })
-
-# all_parts = []
-# for i in tqdm(range(1, 11)):
-#     all_parts.append(parse_clerk(i))
-#
-# pd.concat(all_parts).to_csv("clerk_1.csv", index=False)
-parse_clerk(0)
