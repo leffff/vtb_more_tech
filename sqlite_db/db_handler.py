@@ -1,4 +1,6 @@
 import sqlite3
+
+import pandas
 from pandas import DataFrame
 
 from os import getenv
@@ -30,8 +32,9 @@ def first_db_creation():
                        full_text TEXT NOT NULL,
                        link TEXT NOT NULL,
                        post_date DATE NOT NULL,
+                       trend TEXT NOT NULL,
                        digest TEXT NOT NULL,
-                       trend TEXT NOT NULL, 
+                       insight TEXT NOT NULL,
                        """ + \
                 ', '.join([f"feature_{i} REAL  NOT NULL" for i in range(32)]) + ", " + \
                   """
@@ -62,4 +65,14 @@ def set_like(news_id: int, field: str):
 
 
 if __name__ == "__main__":
-    print(first_db_creation())
+    first_db_creation()
+    with sqlite3.connect("../vtb_hack.db") as conn:
+        cursor = conn.cursor()
+        data = pandas.read_excel(r'C:\Users\Илья\Downloads\Telegram Desktop\news_2 (2).xls')
+        data = data.to_numpy()
+        for row in data:
+            row[1] = row[1].replace('\"', '\"\"')
+            row[2] = row[2].replace('\"', '\"\"')
+            print(row[2])
+            args = ('\"' + str(item) + '\"' for item in row)
+            cursor.execute(f"INSERT INTO news VALUES ({', '.join(args)})")
