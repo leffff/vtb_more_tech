@@ -1,10 +1,6 @@
 import sqlite3
 
-import pandas
 from pandas import DataFrame
-
-from os import getenv
-
 
 # Первое создание базы данных
 '''
@@ -24,7 +20,7 @@ def first_db_creation(path_to_db):
                        user_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
                        category VARCHAR(30) NOT NULL)
                        """
-        )
+                       )
         request = f"""
             CREATE TABLE IF NOT EXISTS news (
                        news_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
@@ -36,12 +32,11 @@ def first_db_creation(path_to_db):
                        digest TEXT NOT NULL,
                        insight TEXT NOT NULL,
                        """ + \
-                ', '.join([f"feature_{i} REAL  NOT NULL" for i in range(32)]) + ", " + \
+                  ', '.join([f"feature_{i} REAL  NOT NULL" for i in range(32)]) + ", " + \
                   """
                   buh_likes INTEGER NOT NULL,
                  business_likes INTEGER NOT NULL)
                   """
-
 
         cursor.execute(
             request
@@ -66,11 +61,7 @@ def put_data(data: DataFrame) -> None:
             args = ', '.join(('\"' + str(item) + '\"' for item in row))
 
             columns = ",".join(["title", "full_text", "link", "post_date", "trend", "digest", "insight"] + \
-                      [f"feature_{i}" for i in range(32)] + ["buh_likes", "business_likes"])
-
-            print(args)
-            print(columns)
-            print(len(args), len(columns))
+                               [f"feature_{i}" for i in range(32)] + ["buh_likes", "business_likes"])
 
             cursor.execute(f"INSERT INTO news ({columns}) VALUES ({args})")
 
@@ -79,7 +70,6 @@ def set_like(news_id: int, field: str):
     with sqlite3.connect("vtb_hack.db") as conn:
         cursor = conn.cursor()
         cursor.execute(f"UPDATE news SET {field}_likes={field}_likes+1 WHERE news_id={news_id}")
-
 
 # if __name__ == "__main__":
 #     first_db_creation()

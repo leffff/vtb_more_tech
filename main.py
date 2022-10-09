@@ -1,10 +1,8 @@
-import json
 import yaml
 from flask import Flask, Response
 
-from init_recsys import init_recsys_cache
-from recsys.online_pipelines import rank_news
 from recsys.offline_pipelines import update_all_models
+from recsys.online_pipelines import rank_news
 from sqlite_db.db_handler import put_data, first_db_creation, set_like
 
 app = Flask(__name__)

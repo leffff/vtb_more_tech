@@ -1,12 +1,10 @@
 from datetime import datetime
-from typing import Tuple
 
 import joblib
 import numpy as np
 import pandas as pd
 import torch
 from catboost import CatBoostClassifier
-from torch.utils.data import TensorDataset
 from tqdm import tqdm
 from transformers import AutoTokenizer, T5ForConditionalGeneration, RobertaTokenizerFast, AutoModel
 
@@ -54,6 +52,7 @@ class DigestExtractor:
                 do_basic_tokenize=False,
                 strip_accents=False
             )
+
     def tokenize(self, sentences: list, seq_len) -> tuple:
         input_ids = []
         attention_masks = []
@@ -152,4 +151,3 @@ class EmbeddingExtractor:
         svd_embeddings = self.svd.transform(embeddings)
 
         return pd.DataFrame(svd_embeddings, columns=[f"feature_{i}" for i in range(32)])
-

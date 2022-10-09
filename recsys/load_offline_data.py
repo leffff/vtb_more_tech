@@ -1,8 +1,5 @@
-import datetime
-
-import numpy as np
 import pandas as pd
-from sqlalchemy.orm import load_only
+
 
 def count_samples_in_categories(conn, categories):
     category_counts = []
@@ -44,6 +41,6 @@ def query_new_offline_data_catboost(categories) -> tuple:
     category_counts = count_samples_in_categories(c, categories)
 
     for i, category in enumerate(categories):
-        new_news_embeddings[like_columns[i]] /= category_counts[i]
+        new_news_embeddings[like_columns[i]] = int((new_news_embeddings[like_columns[i]] / category_counts[i]) > 0.5)
 
     return new_news_embeddings, needed_columns, like_columns

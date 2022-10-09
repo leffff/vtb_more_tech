@@ -23,6 +23,7 @@ def init_recsys_cache():
         "sberbank-ai/ruRoberta-large"
     )
 
+
 with open("config.yaml") as fin:
     config = yaml.safe_load(fin)
 

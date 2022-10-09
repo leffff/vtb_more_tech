@@ -1,7 +1,5 @@
 import os
 
-import joblib
-import pandas as pd
 from recsys.load_offline_data import query_new_offline_data_catboost
 from recsys.wrappers import CatBoostWrapper
 
@@ -12,6 +10,7 @@ def catboost_train_pipeline(model_folder: str, category, data) -> None:
 
     cbc.update(data)
     cbc.save(model_folder)
+
 
 def update_all_models(global_model_folder, categories) -> None:
     category_models = os.listdir(global_model_folder)

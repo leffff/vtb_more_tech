@@ -1,10 +1,9 @@
-from typing import List, Dict
 from datetime import datetime
+from typing import List, Dict
 
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from tqdm import tqdm
 
 
 def parse_rbc() -> List[Dict]:
@@ -19,11 +18,13 @@ def parse_rbc() -> List[Dict]:
     post_times = [quote.find_all('span', class_='item__category')[0].text.strip() for quote in quotes]
     titles = [quote.find_all('span', class_='item__title rm-cm-item-text')[0].text.strip() for quote in quotes]
     news = [
-        {"link": links[i], "category": categories[i], "post_date": post_dates[i], "post_time": post_times[i], "title": titles[i]}
-            for i in range(n_samples)
-            ]
+        {"link": links[i], "category": categories[i], "post_date": post_dates[i], "post_time": post_times[i],
+         "title": titles[i]}
+        for i in range(n_samples)
+    ]
 
     return news
+
 
 def consultant_moth_preprocessor(ru_month_name: str) -> str:
     day, month, year = ru_month_name.split()
@@ -46,6 +47,7 @@ def consultant_moth_preprocessor(ru_month_name: str) -> str:
 
     return f"{year}-{month}-{day}"
 
+
 def parse_consultant(page_num=1) -> pd.DataFrame:
     url = f'https://www.consultant.ru/legalnews/?page={page_num}'
     response = requests.get(url)
@@ -54,19 +56,20 @@ def parse_consultant(page_num=1) -> pd.DataFrame:
     links = ["https://www.consultant.ru" + el.find_all("a")[0]["href"] for el in quotes]
     titles = [el.find_all("span")[0].text for el in quotes]
     page_requests = [BeautifulSoup(requests.get(url).text, 'lxml')
-             for url in links]
+                     for url in links]
 
-    pages = [el\
-             .find_all("div", class_="news-page__text")[0]\
-             .find_all("p")
+    pages = [el \
+                 .find_all("div", class_="news-page__text")[0] \
+                 .find_all("p")
              for el in page_requests]
 
-    dates = list(map(consultant_moth_preprocessor, [el\
-             .find_all("div", class_="news-page__date")[0].text
-             for el in page_requests]))
+    dates = list(map(consultant_moth_preprocessor, [el \
+                     .find_all("div", class_="news-page__date")[0].text
+                                                    for el in page_requests]))
 
-
-    trends = [", ".join([tag.text for tag in el.find_all("div", class_="tags-news__expandable")[0].find_all("span", class_="tags-news__item")]) for el in page_requests]
+    trends = [", ".join([tag.text for tag in el.find_all("div", class_="tags-news__expandable")[0].find_all("span",
+                                                                                                            class_="tags-news__item")])
+              for el in page_requests]
 
     full_texts = []
     for page in pages:
@@ -89,21 +92,23 @@ def parse_clerk(page_num=1) -> pd.DataFrame:
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'lxml')
     quotes = [el for el in soup.find_all('article', class_='feed-item feed-item--normal')]
-    links = ["https://www.klerk.ru" + el.find_all("a", class_="feed-item__link feed-item-link__check-article")[0]["href"] for el in quotes]
+    links = [
+        "https://www.klerk.ru" + el.find_all("a", class_="feed-item__link feed-item-link__check-article")[0]["href"] for
+        el in quotes]
     n_samples = len(links)
     page_requests = [BeautifulSoup(requests.get(url).text, 'lxml')
-             for url in links]
+                     for url in links]
 
     titles = [
         el.find_all("header", class_="article__header")[0].find_all("h1")[0].text
         for el in page_requests
     ]
 
-    full_texts = ["\n".join([tag.text.strip() for tag in el.find_all("div", class_="article__content")[0].find_all("p")])
-             for el in page_requests]
+    full_texts = [
+        "\n".join([tag.text.strip() for tag in el.find_all("div", class_="article__content")[0].find_all("p")])
+        for el in page_requests]
 
     dates = [datetime.today().strftime('%Y-%m-%d')] * n_samples
-
 
     trends = []
     for el in page_requests:
