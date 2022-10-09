@@ -13,9 +13,9 @@ def catboost_train_pipeline(model_folder: str, category, data) -> None:
     cbc.update(data)
     cbc.save(model_folder)
 
-def update_all_models(global_model_folder) -> None:
+def update_all_models(global_model_folder, categories) -> None:
     category_models = os.listdir(global_model_folder)
-    new_news, feature_cols, target_cols = query_new_offline_data_catboost()
+    new_news, feature_cols, target_cols = query_new_offline_data_catboost(categories=categories)
 
     for sum_model_folder in category_models:
         category = sum_model_folder.split("_")[0]

@@ -37,21 +37,23 @@ class CatBoostWrapper:
 
 
 class DigestExtractor:
-    def __init__(self, model_folder):
-        # self.model = T5ForConditionalGeneration.from_pretrained(model_folder, local_files_only=True)
-        # self.tokenizer = AutoTokenizer.from_pretrained(
-        #     model_folder, local_files_only=True,
-        #     do_lower_case=False,
-        #     do_basic_tokenize=False,
-        #     strip_accents=False
-        # )
-        self.model = T5ForConditionalGeneration.from_pretrained("IlyaGusev/rut5_base_sum_gazeta")
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            "IlyaGusev/rut5_base_sum_gazeta",
-            do_lower_case=False,
-            do_basic_tokenize=False,
-            strip_accents=False
-        )
+    def __init__(self, download_models_cache, model_folder):
+        if download_models_cache:
+            self.model = T5ForConditionalGeneration.from_pretrained("IlyaGusev/rut5_base_sum_gazeta")
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                "IlyaGusev/rut5_base_sum_gazeta",
+                do_lower_case=False,
+                do_basic_tokenize=False,
+                strip_accents=False
+            )
+        else:
+            self.model = T5ForConditionalGeneration.from_pretrained(model_folder, local_files_only=True)
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                model_folder, local_files_only=True,
+                do_lower_case=False,
+                do_basic_tokenize=False,
+                strip_accents=False
+            )
     def tokenize(self, sentences: list, seq_len) -> tuple:
         input_ids = []
         attention_masks = []
@@ -96,15 +98,17 @@ class DigestExtractor:
 
 
 class EmbeddingExtractor:
-    def __init__(self, model_folder, svd_path):
-        # self.model = AutoModel.from_pretrained(model_folder, local_files_only=True)
-        # self.tokenizer = RobertaTokenizerFast.from_pretrained(
-        #     model_folder, local_files_only=True
-        # )
-        self.model = AutoModel.from_pretrained("sberbank-ai/ruRoberta-large")
-        self.tokenizer = RobertaTokenizerFast.from_pretrained(
-            "sberbank-ai/ruRoberta-large"
-        )
+    def __init__(self, download_models_cache, model_folder, svd_path):
+        if download_models_cache:
+            self.model = AutoModel.from_pretrained("sberbank-ai/ruRoberta-large")
+            self.tokenizer = RobertaTokenizerFast.from_pretrained(
+                "sberbank-ai/ruRoberta-large"
+            )
+        else:
+            self.model = AutoModel.from_pretrained(model_folder, local_files_only=True)
+            self.tokenizer = RobertaTokenizerFast.from_pretrained(
+                model_folder, local_files_only=True
+            )
         with open(svd_path, "rb") as fin:
             self.svd = joblib.load(fin)
 

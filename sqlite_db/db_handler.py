@@ -15,8 +15,8 @@ return {"result": "unknown error"}
 '''
 
 
-def first_db_creation():
-    with sqlite3.connect("vtb_hack.db") as conn:
+def first_db_creation(path_to_db):
+    with sqlite3.connect(path_to_db) as conn:
         cursor = conn.cursor()
 
         cursor.execute("""

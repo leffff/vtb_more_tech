@@ -10,15 +10,16 @@ from recsys.wrappers import DigestExtractor, CatBoostWrapper, EmbeddingExtractor
 def rank_news(digest_extractor_folder="rubert_telegram_headlines",
               embedding_extractor_folder="",
               catboost_folder="catboost_models",
-              svd_folder="svd_models") -> tuple:
+              svd_folder="svd_models",
+              download_models_cache=True) -> tuple:
     news_parsed = []
     for parser in [parse_clerk, parse_consultant]:
         news_parsed.append(parser())
 
     news = pd.concat(news_parsed).dropna().reset_index(drop=True)
 
-    digest_model = DigestExtractor(digest_extractor_folder)
-    embeddings_model = EmbeddingExtractor(embedding_extractor_folder, f"{svd_folder}/{os.listdir(svd_folder)[-1]}")
+    digest_model = DigestExtractor(download_models_cache, digest_extractor_folder)
+    embeddings_model = EmbeddingExtractor(download_models_cache, embedding_extractor_folder, f"{svd_folder}/{os.listdir(svd_folder)[-1]}")
 
     scorers = []
     for sub_folder in os.listdir(catboost_folder):
@@ -32,8 +33,10 @@ def rank_news(digest_extractor_folder="rubert_telegram_headlines",
 
     scores = [cbc.get_scores(embeddings).reset_index(drop=True) for cbc in scorers]
 
-    buh_news = pd.concat([news, digests, scores[0]], axis=1).sort_values("buh", ascending=False).iloc[:3].drop(labels=["buh"], axis=1)
-    business_news = pd.concat([news, digests, scores[1]], axis=1).sort_values("business", ascending=False).iloc[:3].drop(labels=["business"], axis=1)
+    print(*scores, sep="\n")
+
+    buh_news = pd.concat([news, digests, scores[1]], axis=1).sort_values("buh", ascending=False).iloc[:3].drop(labels=["buh"], axis=1)
+    business_news = pd.concat([news, digests, scores[0]], axis=1).sort_values("business", ascending=False).iloc[:3].drop(labels=["business"], axis=1)
 
     likes = pd.DataFrame(
         data={

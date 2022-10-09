@@ -31,12 +31,12 @@ def get_new_news(conn):
     return news
 
 
-def query_new_offline_data_catboost(conn, categories) -> tuple:
+def query_new_offline_data_catboost(categories) -> tuple:
     import sqlite3
     conn = sqlite3.connect('../vtb_hack.db')
     c = conn.cursor()
 
-    like_columns = [f"{category}_likes" for category in categories]
+    like_columns = [f"{category}" for category in categories]
     needed_columns = [f"features_{i}" for i in range(32)]
 
     new_news_embeddings = get_new_news(c)
