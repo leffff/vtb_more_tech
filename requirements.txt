@@ -12,3 +12,4 @@ joblib==1.2.0
 isort
 black
 lxml
+xlrd==2.0.1

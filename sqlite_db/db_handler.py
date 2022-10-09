@@ -32,7 +32,7 @@ def first_db_creation():
                        full_text TEXT NOT NULL,
                        link TEXT NOT NULL,
                        post_date DATE NOT NULL,
-                       trend TEXT NOT NULL,
+                       trend TEXT NOT NULL, 
                        digest TEXT NOT NULL,
                        insight TEXT NOT NULL,
                        """ + \
@@ -54,25 +54,17 @@ def first_db_creation():
 def put_data(data: DataFrame) -> None:
     with sqlite3.connect("../vtb_hack.db") as conn:
         cursor = conn.cursor()
+        data = data.to_numpy()
         for row in data:
-            cursor.execute(f"INSERT INTO news VALUES ({', '.join(row)})")
+            row[1] = row[1].replace('\"', '\"\"')
+            row[2] = row[2].replace('\"', '\"\"')
+            args = ('\"' + str(item) + '\"' for item in row)
+            print(args)
+            cursor.execute(f"INSERT INTO news VALUES ({', '.join(args)})")
 
 
 def set_like(news_id: int, field: str):
     with sqlite3.connect("../vtb_hack.db") as conn:
         cursor = conn.cursor()
-        cursor.execute(f"UPDATE news SET {field}={field}+1 WHERE id={news_id}")
+        cursor.execute(f"UPDATE news SET {field}_likes={field}_likes+1 WHERE news_id={news_id}")
 
-
-if __name__ == "__main__":
-    first_db_creation()
-    with sqlite3.connect("../vtb_hack.db") as conn:
-        cursor = conn.cursor()
-        data = pandas.read_excel(r'C:\Users\Илья\Downloads\Telegram Desktop\news_2 (2).xls')
-        data = data.to_numpy()
-        for row in data:
-            row[1] = row[1].replace('\"', '\"\"')
-            row[2] = row[2].replace('\"', '\"\"')
-            print(row[2])
-            args = ('\"' + str(item) + '\"' for item in row)
-            cursor.execute(f"INSERT INTO news VALUES ({', '.join(args)})")

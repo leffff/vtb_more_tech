@@ -10,6 +10,8 @@ from torch.utils.data import TensorDataset
 from tqdm import tqdm
 from transformers import AutoTokenizer, T5ForConditionalGeneration, RobertaTokenizerFast, AutoModel
 
+from recsys.utils import preprocess
+
 
 class CatBoostWrapper:
     def __init__(self, path_to_base_model, category: str):
@@ -30,24 +32,30 @@ class CatBoostWrapper:
         self.model.save_model(f"{save_folder}/{datetime.now()}.cbm")
 
     def get_scores(self, table) -> pd.DataFrame:
-        scores = self.model.predict_proba(table)
+        scores = self.model.predict_proba(table)[:, 1]
         return pd.DataFrame(scores, columns=[self.category])
 
 
 class DigestExtractor:
     def __init__(self, model_folder):
-        self.model = T5ForConditionalGeneration.from_pretrained(model_folder, local_files_only=True)
+        # self.model = T5ForConditionalGeneration.from_pretrained(model_folder, local_files_only=True)
+        # self.tokenizer = AutoTokenizer.from_pretrained(
+        #     model_folder, local_files_only=True,
+        #     do_lower_case=False,
+        #     do_basic_tokenize=False,
+        #     strip_accents=False
+        # )
+        self.model = T5ForConditionalGeneration.from_pretrained("IlyaGusev/rut5_base_sum_gazeta")
         self.tokenizer = AutoTokenizer.from_pretrained(
-            model_folder, local_files_only=True,
+            "IlyaGusev/rut5_base_sum_gazeta",
             do_lower_case=False,
             do_basic_tokenize=False,
             strip_accents=False
         )
-
     def tokenize(self, sentences: list, seq_len) -> tuple:
         input_ids = []
         attention_masks = []
-        for row in tqdm(sentences):
+        for row in tqdm(list(sentences)):
             encoded_dict = self.tokenizer.encode_plus(
                 row,
                 add_special_tokens=True,
@@ -64,11 +72,13 @@ class DigestExtractor:
 
         input_ids = torch.cat(input_ids, dim=0)
         attention_masks = torch.cat(attention_masks, dim=0)
+
         return input_ids, attention_masks
 
     def get_digest(self, data: pd.DataFrame) -> pd.DataFrame:
-        input_ids, attention_masks = self.tokenize(data["full_text"], 256)
+        input_ids, attention_masks = self.tokenize(data["full_text"].apply(preprocess), 256)
         digests = []
+
         for i in tqdm(range(len(input_ids))):
             output_ids = self.model.generate(
                 input_ids=torch.unsqueeze(input_ids[i], 0),
@@ -87,9 +97,13 @@ class DigestExtractor:
 
 class EmbeddingExtractor:
     def __init__(self, model_folder, svd_path):
-        self.model = AutoModel.from_pretrained(model_folder, local_files_only=True)
+        # self.model = AutoModel.from_pretrained(model_folder, local_files_only=True)
+        # self.tokenizer = RobertaTokenizerFast.from_pretrained(
+        #     model_folder, local_files_only=True
+        # )
+        self.model = AutoModel.from_pretrained("sberbank-ai/ruRoberta-large")
         self.tokenizer = RobertaTokenizerFast.from_pretrained(
-            model_folder, local_files_only=True
+            "sberbank-ai/ruRoberta-large"
         )
         with open(svd_path, "rb") as fin:
             self.svd = joblib.load(fin)
@@ -117,7 +131,7 @@ class EmbeddingExtractor:
         return input_ids, attention_masks
 
     def get_embeddings(self, data: pd.DataFrame) -> pd.DataFrame:
-        input_ids, attention_masks = self.tokenize(data["full_text"], 128)
+        input_ids, attention_masks = self.tokenize(data["full_text"].apply(preprocess), 128)
 
         embeddings = []
         self.model.eval()

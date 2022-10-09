@@ -1,4 +1,6 @@
 from flask import Flask
+
+from init_recsys import init_recsys_cache
 from recsys.online_pipelines import rank_news
 from recsys.offline_pipelines import update_all_models
 from sqlite_db.db_handler import put_data, first_db_creation, set_like
@@ -21,7 +23,7 @@ def business_news():
     return news.to_json()
 
 
-@app.route("/like/<int:pk>/<str:field>", methods=["POST"])
+@app.route("/like/<int:pk>/<string:field>", methods=["POST"])
 def like(pk: int, field: str):
     set_like(pk, field)
 
@@ -32,5 +34,6 @@ def offline_training():
 
 
 if __name__ == "__main__":
+    # init_recsys_cache()
     app.config["WTF_CSRF_ENABLED"] = False
     app.run(debug=True)

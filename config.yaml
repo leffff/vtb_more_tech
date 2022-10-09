@@ -6,6 +6,8 @@ embeddings:
   model_name: "sberbank-ai/ruRoberta-large"
   local_dir: "ruRoberta-large"
 
+download_models_cache: True
+
 svd:
   local_dir: "svd_models"
 

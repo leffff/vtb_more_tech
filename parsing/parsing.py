@@ -79,7 +79,7 @@ def parse_consultant(page_num=1) -> pd.DataFrame:
         "title": titles,
         "full_text": full_texts,
         "link": links,
-        "date": dates,
+        "post_date": dates,
         "trend": trends
     })
 
@@ -117,6 +117,6 @@ def parse_clerk(page_num=1) -> pd.DataFrame:
         "title": titles,
         "full_text": full_texts,
         "link": links,
-        "date": dates,
+        "post_date": dates,
         "trend": trends,
     })

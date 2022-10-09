@@ -2,9 +2,8 @@ import os
 
 import joblib
 import pandas as pd
-from load_offline_data import query_new_offline_data_catboost
-from wrappers import CatBoostWrapper
-from category_config import categories
+from recsys.load_offline_data import query_new_offline_data_catboost
+from recsys.wrappers import CatBoostWrapper
 
 
 def catboost_train_pipeline(model_folder: str, category, data) -> None:
