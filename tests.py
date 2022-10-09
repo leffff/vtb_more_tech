@@ -11,5 +11,5 @@ print(
               embedding_extractor_folder=config["embeddings"]["local_dir"],
               catboost_folder=config["catboost"]["local_dir"],
               svd_folder=config["svd"]["local_dir"]
-    )
+    ), sep="\n\n"
 )
