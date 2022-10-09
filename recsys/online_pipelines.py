@@ -32,8 +32,8 @@ def rank_news(digest_extractor_folder="rubert_telegram_headlines",
 
     scores = [cbc.get_scores(embeddings).reset_index(drop=True) for cbc in scorers]
 
-    buh_news = pd.concat([news, digests, scores[0]], axis=1)
-    business_news = pd.concat([news, digests, scores[1]], axis=1)
+    buh_news = pd.concat([news, digests, scores[0]], axis=1).sort_values("buh", ascending=False).iloc[:3].drop(labels=["buh"], axis=1)
+    business_news = pd.concat([news, digests, scores[1]], axis=1).sort_values("business", ascending=False).iloc[:3].drop(labels=["business"], axis=1)
 
     likes = pd.DataFrame(
         data={

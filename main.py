@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, Response
 
 from init_recsys import init_recsys_cache
 from recsys.online_pipelines import rank_news
@@ -13,14 +13,14 @@ app = Flask(__name__)
 def buh_news():
     news, _, to_db = rank_news()
     put_data(to_db)
-    return news
+    return Response(news.to_json(), status=200)
 
 
 @app.route("/business", methods=["GET"])
 def business_news():
     _, news, to_db = rank_news()
     put_data(to_db)
-    return news.to_json()
+    return Response(news.to_json(), status=200)
 
 
 @app.route("/like/<int:pk>/<string:field>", methods=["POST"])

@@ -16,7 +16,7 @@ return {"result": "unknown error"}
 
 
 def first_db_creation():
-    with sqlite3.connect("../vtb_hack.db") as conn:
+    with sqlite3.connect("vtb_hack.db") as conn:
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -52,19 +52,44 @@ def first_db_creation():
 
 
 def put_data(data: DataFrame) -> None:
-    with sqlite3.connect("../vtb_hack.db") as conn:
+    with sqlite3.connect("vtb_hack.db") as conn:
         cursor = conn.cursor()
         data = data.to_numpy()
         for row in data:
             row[1] = row[1].replace('\"', '\"\"')
             row[2] = row[2].replace('\"', '\"\"')
-            args = ('\"' + str(item) + '\"' for item in row)
+            # args = [('\"' + str(item) + '\"').replace(",", "") for item in row[:3]] +\
+            #        [str(row[3])]+ \
+            #        [('\"' + str(item) + '\"').replace(",", "") for item in row[4:-34]]+ \
+            #        [str(item) for item in row[-34:]]
+
+            args = ', '.join(('\"' + str(item) + '\"' for item in row))
+
+            columns = ",".join(["title", "full_text", "link", "post_date", "trend", "digest", "insight"] + \
+                      [f"feature_{i}" for i in range(32)] + ["buh_likes", "business_likes"])
+
             print(args)
-            cursor.execute(f"INSERT INTO news VALUES ({', '.join(args)})")
+            print(columns)
+            print(len(args), len(columns))
+
+            cursor.execute(f"INSERT INTO news ({columns}) VALUES ({args})")
 
 
 def set_like(news_id: int, field: str):
-    with sqlite3.connect("../vtb_hack.db") as conn:
+    with sqlite3.connect("vtb_hack.db") as conn:
         cursor = conn.cursor()
         cursor.execute(f"UPDATE news SET {field}_likes={field}_likes+1 WHERE news_id={news_id}")
 
+
+# if __name__ == "__main__":
+#     first_db_creation()
+#     with sqlite3.connect("../vtb_hack.db") as conn:
+#         cursor = conn.cursor()
+#         data = pandas.read_excel('../news_2 (2).xls')
+#         data = data.to_numpy()
+#         for row in data:
+#             row[1] = row[1].replace('\"', '\"\"')
+#             row[2] = row[2].replace('\"', '\"\"')
+#             print(row[2])
+#             args = ('\"' + str(item) + '\"' for item in row)
+#             cursor.execute(f"INSERT INTO news VALUES ({', '.join(args)})")
