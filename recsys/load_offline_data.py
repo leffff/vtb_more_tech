@@ -30,7 +30,7 @@ def get_new_news(conn):
 
 def query_new_offline_data_catboost(categories) -> tuple:
     import sqlite3
-    conn = sqlite3.connect('../vtb_hack.db')
+    conn = sqlite3.connect('vtb_hack.db')
     c = conn.cursor()
 
     like_columns = [f"{category}" for category in categories]
