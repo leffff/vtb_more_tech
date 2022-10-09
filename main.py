@@ -14,14 +14,14 @@ app = Flask(__name__)
 def buh_news():
     news, _, to_db = rank_news(config["download_models_cache"])
     put_data(to_db)
-    return Response(json.loads(json.dumps(news.to_json(), ensure_ascii=False)), status=200)
+    return Response(str(news.to_json(force_ascii=False)), status=200)
 
 
 @app.route("/business", methods=["GET"])
 def business_news():
     _, news, to_db = rank_news(config["download_models_cache"])
     put_data(to_db)
-    return Response(json.loads(json.dumps(news.to_json(), ensure_ascii=False)), status=200)
+    return Response(str(news.to_json(force_ascii=False)), status=200)
 
 
 @app.route("/like/<int:pk>/<string:field>", methods=["POST"])
