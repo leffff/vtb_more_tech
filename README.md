@@ -1,5 +1,7 @@
 # vtb_more_tech
 
+# Решение команды MLшарики
+
 ## Установка
 
 Запустите в терминале команду `pip install -r requirements.txt`
